@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title th:text="${materia.id == null ? 'Nueva materia' : 'Editar materia'}">
+        Formulario de materia
+    </title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f1f5f9;
+            color: #1e293b;
+            font-family: Arial, sans-serif;
+        }
+
+        main {
+            max-width: 700px;
+            margin: 45px auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: #16324f;
+            color: white;
+            padding: 28px;
+            border-radius: 14px;
+            margin-bottom: 24px;
+        }
+
+        header h1 {
+            margin: 8px 0;
+        }
+
+        header p {
+            color: #dbeafe;
+            line-height: 1.5;
+        }
+
+        .etiqueta {
+            font-size: 13px;
+            letter-spacing: 2px;
+        }
+
+        .panel {
+            background: white;
+            padding: 28px;
+            border-radius: 14px;
+            box-shadow: 0 4px 18px #16324f12;
+        }
+
+        .campo {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            background: white;
+            color: #1e293b;
+            font: inherit;
+        }
+
+        input:focus, select:focus {
+            outline: 2px solid #93c5fd;
+            border-color: #1d4ed8;
+        }
+
+        .ayuda {
+            margin: 8px 0 0;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .acciones {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 28px;
+        }
+
+        .boton {
+            display: inline-block;
+            border: none;
+            border-radius: 7px;
+            padding: 12px 18px;
+            font: inherit;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .principal {
+            background: #1d4ed8;
+            color: white;
+        }
+
+        .secundario {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .aviso {
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .advertencia {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+<main>
+    <header>
+        <span class="etiqueta">GESTIÓN ACADÉMICA</span>
+
+        <h1 th:text="${materia.id == null ? 'Nueva materia' : 'Editar materia'}">
+            Nueva materia
+        </h1>
+
+        <p>Captura el nombre y selecciona el área a la que pertenece.</p>
+    </header>
+
+    <section class="panel">
+        <div th:if="${error}"
+             class="aviso error"
+             role="alert"
+             th:text="${error}">
+        </div>
+
+        <div th:if="${#lists.isEmpty(areas)}"
+             class="aviso advertencia"
+             role="status">
+            No hay áreas disponibles. Primero debes registrar un área.
+        </div>
+
+        <form th:action="@{/materias/guardar}" method="post">
+
+            <input type="hidden"
+                   name="id"
+                   th:value="${materia.id}">
+
+            <div class="campo">
+                <label for="nombre">Nombre de la materia</label>
+
+                <input type="text"
+                       id="nombre"
+                       name="nombre"
+                       th:value="${materia.nombre}"
+                       placeholder="Ejemplo: Programación Web"
+                       maxlength="150"
+                       required>
+
+                <p class="ayuda">Máximo 150 caracteres.</p>
+            </div>
+
+            <div class="campo"
+                 th:with="seleccion=${areaSeleccionada != null
+                     ? areaSeleccionada
+                     : (materia.area != null ? materia.area.id : null)}">
+
+                <label for="areaId">Área</label>
+
+                <select id="areaId" name="areaId" required>
+                    <option value=""
+                            disabled
+                            th:selected="${seleccion == null}">
+                        Selecciona un área
+                    </option>
+
+                    <option th:each="area : ${areas}"
+                            th:value="${area.id}"
+                            th:text="${area.nombre}"
+                            th:selected="${area.id == seleccion}">
+                    </option>
+                </select>
+
+                <p class="ayuda">
+                    Cada materia debe pertenecer a un área.
+                </p>
+            </div>
+
+            <div class="acciones">
+                <button type="submit"
+                        class="boton principal"
+                        th:disabled="${#lists.isEmpty(areas)}"
+                        th:text="${materia.id == null
+                            ? 'Registrar materia'
+                            : 'Guardar cambios'}">
+                    Guardar
+                </button>
+
+                <a th:href="@{/materias}" class="boton secundario">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </section>
+
+    <footer>
+        Actividad 3 · Ángel Yibán Ruiz Osante
+    </footer>
+</main>
+</body>
+</html>
